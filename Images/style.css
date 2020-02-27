@@ -1,0 +1,28 @@
+div {
+    border-style: solid;
+}
+
+#sigwxNA {
+    width: 1100px;
+    height: 650px;
+}
+
+#sigwxEUA {
+    width: 1100px;
+    height: 650px;
+}
+
+#surwc {
+    width: 110%;
+    padding-bottom: 20px;
+}
+
+div.scrollmenu {
+    overflow: auto;
+    white-space: nowrap;
+}
+
+
+div.image {
+    display: inline-block;
+}
