@@ -32,7 +32,7 @@ def aviationweather():
 def initialize_template():
     path = os.path.dirname(os.path.realpath(__file__))
     TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                  'DIRS': [f'{path}/Images']}]
+                  'DIRS': [f'{path}/Resources']}]
     django.conf.settings.configure(TEMPLATES=TEMPLATES)
     django.setup()
     template = django.template.loader.get_template('template.html')
@@ -40,9 +40,9 @@ def initialize_template():
 
 
 def show(page, path):
-    with open(f'{path}/Images/page.html', 'w') as f:
+    with open(f'{path}/Resources/page.html', 'w') as f:
         f.write(page)
-    webbrowser.get('safari').open_new_tab(f"file://{path}/Images/page.html")
+    webbrowser.get('safari').open_new_tab(f"file://{path}/Resources/page.html")
 
 
 def main():
