@@ -15,7 +15,7 @@
 <body onload="openPage('windy')">
     <div class="container-fluid">
         <div class="" id="navbar">
-            <nav class="nav nav-pills nav-justified">
+            <nav class="nav nav-tabs nav-fill">
                 <a class="nav-item nav-link active" href="#" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true" onclick="openPage('windy')">Live situation</a>
                 <a class="nav-item nav-link" href="#" <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false" onclick="openPage('surface')">Surface</a>
                 <a class="nav-item nav-link" href="#" <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false" onclick="openPage('significant')">Significant
@@ -34,39 +34,35 @@
             <div class="scrollmenu">
                 
                 <div class="image">
-                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118106049" alt="">
+                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118293300" alt="">
                 </div>
                 
                 <div class="image">
-                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118115783" alt="">
+                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118302644" alt="">
                 </div>
                 
                 <div class="image">
-                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118115802" alt="">
+                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118302640" alt="">
                 </div>
                 
                 <div class="image">
-                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118118142" alt="">
+                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118303541" alt="">
                 </div>
                 
                 <div class="image">
-                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118118143" alt="">
+                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118303543" alt="">
                 </div>
                 
                 <div class="image">
-                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118120959" alt="">
+                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118307458" alt="">
                 </div>
                 
                 <div class="image">
-                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118120968" alt="">
+                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118307460" alt="">
                 </div>
                 
                 <div class="image">
-                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118064577" alt="">
-                </div>
-                
-                <div class="image">
-                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118064570" alt="">
+                    <img id="surwc" src="https://www.metoffice.gov.uk/public/data/CoreProductCache/SurfacePressureChart/Item/ProductId/118307462" alt="">
                 </div>
                 
             </div>
@@ -74,18 +70,163 @@
 
         <div class="tabcontent" id="significant">
             <h2>Significant weather charts</h2>
-            <div class="">
-                <div class="scrollmenu">
-                    <div class="image" id="sigwx">
-                        <h3>North Atlantic</h3>
-                        <img id="sigwxNA" src="https://aviationweather.gov/data/iffdp/2135.gif" alt="">
-                    </div>
+            
+            <h3>North Atlantic</h3>
+            <div class="scrollmenu">
+                
+                <div class="image" id="sigwx_area">
+                    <h4>Latest</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/2135.gif" alt="https://aviationweather.gov/data/iffdp/2135.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>6h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/3135.gif" alt="https://aviationweather.gov/data/iffdp/3135.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>12h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/4135.gif" alt="https://aviationweather.gov/data/iffdp/4135.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>18h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/5135.gif" alt="https://aviationweather.gov/data/iffdp/5135.gif">
+                </div>
+                
+            </div>
+            
+            <h3>Europa/Asia</h3>
+            <div class="scrollmenu">
+                
+                <div class="image" id="sigwx_area">
+                    <h4>Latest</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/2105.gif" alt="https://aviationweather.gov/data/iffdp/2105.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>6h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/3105.gif" alt="https://aviationweather.gov/data/iffdp/3105.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>12h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/4105.gif" alt="https://aviationweather.gov/data/iffdp/4105.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>18h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/5105.gif" alt="https://aviationweather.gov/data/iffdp/5105.gif">
+                </div>
+                
+            </div>
+            
+            <h3>Polar North America/Europe</h3>
+            <div class="scrollmenu">
+                
+                <div class="image" id="sigwx_area">
+                    <h4>Latest</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/2108.gif" alt="https://aviationweather.gov/data/iffdp/2108.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>6h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/3108.gif" alt="https://aviationweather.gov/data/iffdp/3108.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>12h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/4108.gif" alt="https://aviationweather.gov/data/iffdp/4108.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>18h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/5108.gif" alt="https://aviationweather.gov/data/iffdp/5108.gif">
+                </div>
+                
+            </div>
+            
+            <h3>America/Africa</h3>
+            <div class="scrollmenu">
+                
+                <div class="image" id="sigwx_area">
+                    <h4>Latest</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/2130.gif" alt="https://aviationweather.gov/data/iffdp/2130.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>6h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/3130.gif" alt="https://aviationweather.gov/data/iffdp/3130.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>12h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/4130.gif" alt="https://aviationweather.gov/data/iffdp/4130.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>18h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/5130.gif" alt="https://aviationweather.gov/data/iffdp/5130.gif">
+                </div>
+                
+            </div>
+            
+            <h3>Pacific</h3>
+            <div class="scrollmenu">
+                
+                <div class="image" id="sigwx_area">
+                    <h4>Latest</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/2131.gif" alt="https://aviationweather.gov/data/iffdp/2131.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>6h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/3131.gif" alt="https://aviationweather.gov/data/iffdp/3131.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>12h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/4131.gif" alt="https://aviationweather.gov/data/iffdp/4131.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>18h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/5131.gif" alt="https://aviationweather.gov/data/iffdp/5131.gif">
+                </div>
+                
+            </div>
+            
+            <h3>Polar South Africa/Australia</h3>
+            <div class="scrollmenu">
+                
+                <div class="image" id="sigwx_area">
+                    <h4>Latest</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/2109.gif" alt="https://aviationweather.gov/data/iffdp/2109.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>6h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/3109.gif" alt="https://aviationweather.gov/data/iffdp/3109.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>12h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/4109.gif" alt="https://aviationweather.gov/data/iffdp/4109.gif">
+                </div>
+                
+                <div class="image" id="sigwx_area">
+                    <h4>18h</h4>
+                    <img id="sigwx" src="https://aviationweather.gov/data/iffdp/5109.gif" alt="https://aviationweather.gov/data/iffdp/5109.gif">
+                </div>
+                
+            </div>
+            
+            <!-- <div class="scrollmenu">
                     <div class="image" id="sigwx">
                         <h3>Europe / Asia</h3>
                         <img id="sigwxEUA" src="https://aviationweather.gov/data/iffdp/2105.gif" alt="">
                     </div>
-                </div>
-            </div>
+                </div> -->
         </div>
     </div>
 </body>

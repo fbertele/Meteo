@@ -1,13 +1,11 @@
 /* div {
     border-style: solid;
 } */
-
-#sigwxNA {
-    width: 1100px;
-    height: 650px;
+body {
+    overflow-x: hidden;
 }
 
-#sigwxEUA {
+#sigwx {
     width: 1100px;
     height: 650px;
 }
@@ -27,7 +25,7 @@ div.image {
     display: inline-block;
 }
 
-#navbar{
+/* #navbar{
     border-radius: 5px;
 
-}
+} */

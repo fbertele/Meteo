@@ -15,7 +15,7 @@
 <body onload="openPage('windy')">
     <div class="container-fluid">
         <div class="" id="navbar">
-            <nav class="nav nav-pills nav-justified">
+            <nav class="nav nav-tabs nav-fill">
                 <a class="nav-item nav-link active" href="#" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true" onclick="openPage('windy')">Live situation</a>
                 <a class="nav-item nav-link" href="#" <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false" onclick="openPage('surface')">Surface</a>
                 <a class="nav-item nav-link" href="#" <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false" onclick="openPage('significant')">Significant
@@ -32,9 +32,9 @@
         <div class="tabcontent" id="surface">
             <h2>Surface weather charts</h2>
             <div class="scrollmenu">
-                {% for link in links %}
+                {% for surface_link in surface_links %}
                 <div class="image">
-                    <img id="surwc" src="{{link}}" alt="">
+                    <img id="surwc" src="{{surface_link}}" alt="">
                 </div>
                 {% endfor %}
             </div>
@@ -42,18 +42,23 @@
 
         <div class="tabcontent" id="significant">
             <h2>Significant weather charts</h2>
-            <div class="">
-                <div class="scrollmenu">
-                    <div class="image" id="sigwx">
-                        <h3>North Atlantic</h3>
-                        <img id="sigwxNA" src="https://aviationweather.gov/data/iffdp/2135.gif" alt="">
-                    </div>
+            {% for sigwx_link_area, sigwx_link in sigwx_links.items %}
+            <h3>{{sigwx_link_area}}</h3>
+            <div class="scrollmenu">
+                {% for title, link in sigwx_link.items %}
+                <div class="image" id="sigwx_area">
+                    <h4>{{title}}</h4>
+                    <img id="sigwx" src="{{link}}" alt="{{link}}">
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <!-- <div class="scrollmenu">
                     <div class="image" id="sigwx">
                         <h3>Europe / Asia</h3>
                         <img id="sigwxEUA" src="https://aviationweather.gov/data/iffdp/2105.gif" alt="">
                     </div>
-                </div>
-            </div>
+                </div> -->
         </div>
     </div>
 </body>
