@@ -2,8 +2,8 @@ body {
     overflow-x: hidden;
 }
 
-#sigwx {
-    width: 1100px;
+#sigwx, #surwc_dwd {
+    width: 900px;
     height: 650px;
 }
 
