@@ -1,5 +1,22 @@
 from bs4 import BeautifulSoup as bSoup
 import requests
+import json
+
+
+def mapquest(location):
+    try:
+        key = 'Tm4mu78olBqALvxM0SlfjwGNeEGUi9Qj'
+        url = f'http://www.mapquestapi.com/geocoding/v1/address?key={key}&location={location}'
+        source = requests.get(url).text
+        response = json.loads(source)['results'][0]['locations'][0]
+        # Extract address infos to check if results are valid
+        addr = (response['street'], response['adminArea5'],
+                response['adminArea3'], response['adminArea1'])
+        # Extract coordinates and return them in a tuple
+        coordinates = (response['latLng']['lat'], response['latLng']['lng'])
+        return (coordinates)
+    except:
+        raise ValueError('A problem occured connecting to mapquest')
 
 
 def chartmetuk():
