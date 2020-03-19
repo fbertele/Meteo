@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup as bSoup
 import requests
 import json
 import config
+import os
+from math import radians, degrees, sin, cos, asin, acos, sqrt
 
 
 def mapquest(location):
@@ -49,5 +51,36 @@ def aviationweather():
     return sigwx_links
 
 
+def airports_codes(coords, radius=50, filename='airports.json'):
+    def great_circle(lon1, lat1, lon2, lat2):
+        # Return great circle distances in Km
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        return 2 * 6371 * asin(sqrt(a))
+
+    path = os.path.dirname(os.path.realpath(__file__))
+    with open(f'{path}/Resources/{filename}', 'r') as codes:
+        airpts = json.load(codes)
+    distances = {}
+    target_lon, target_lat = coords[1], coords[0]
+    for airpt in airpts:
+        # Get lat and long from airports in airports_codes
+        airpt_lon, airpt_lat = [float(coord) for coord in airpt['coordinates'].split(',')]
+        # Calculate distances and store them in a dictionary {'icao_code': dist, ...}
+        dist = great_circle(airpt_lon, airpt_lat, target_lon, target_lat)
+        distances[airpt['icao_code']] = dist
+    # Sort distances dictionary
+    sorted_dist = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
+    # Get icao codes for airports in the 50 km radius from target position
+    target_icao_codes = [key for key, value in sorted_dist.items() if value < radius]
+    # Get names of airports in target_icao_codes
+    target_names = [airpt['name'] for code in target_icao_codes
+                    for airpt in airpts if airpt['icao_code'] == code]
+    return target_icao_codes, target_names
+
+
 if __name__ == '__main__':
+    # print(airports_codes(mapquest('milano')))
     main()

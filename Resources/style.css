@@ -2,11 +2,15 @@ body {
     overflow-x: hidden;
 }
 
-#sigwx, #surwc_dwd {
+#sigwx  {
     width: 900px;
     height: 650px;
 }
 
+#surwc_dwd {
+    width: 900px;
+    height: 650px;
+}
 #surwc {
     width: 110%;
     padding-bottom: 20px;
