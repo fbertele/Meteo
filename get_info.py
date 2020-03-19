@@ -1,9 +1,9 @@
+from math import radians, degrees, sin, cos, asin, acos, sqrt
 from bs4 import BeautifulSoup as bSoup
 import requests
 import json
 import config
 import os
-from math import radians, degrees, sin, cos, asin, acos, sqrt
 
 
 def mapquest(location):
@@ -52,6 +52,7 @@ def aviationweather():
 
 
 def airports_codes(coords, radius=50, filename='airports.json'):
+
     def great_circle(lon1, lat1, lon2, lat2):
         # Return great circle distances in Km
         lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
@@ -81,6 +82,14 @@ def airports_codes(coords, radius=50, filename='airports.json'):
     return target_icao_codes, target_names
 
 
+def get_metar(icao_code):
+    url = f'https://www.aviationweather.gov/metar/data?ids={icao_code}&format=raw&taf=on'
+    source = bSoup(requests.get(url).text, 'lxml')
+    metar = [elem.text.replace('\xa0\xa0', '\n') for elem in source.find_all('code')]
+    return metar
+
+
 if __name__ == '__main__':
     # print(airports_codes(mapquest('milano')))
     main()
+    # get_metar('limc')
