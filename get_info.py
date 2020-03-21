@@ -1,5 +1,6 @@
 from math import radians, degrees, sin, cos, asin, acos, sqrt
 from bs4 import BeautifulSoup as bSoup
+import concurrent.futures
 import requests
 import json
 import config
@@ -11,12 +12,9 @@ def mapquest(location):
     url = f'http://www.mapquestapi.com/geocoding/v1/address?key={key}&location={location}'
     source = requests.get(url).text
     response = json.loads(source)['results'][0]['locations'][0]
-    # Extract address infos to check if results are valid
-    addr = (response['street'], response['adminArea5'],
-            response['adminArea3'], response['adminArea1'])
     # Extract coordinates and return them in a tuple
-    coordinates = (response['latLng']['lat'], response['latLng']['lng'])
-    return (coordinates)
+    coordinates = tuple(round(response['latLng'][tag], 3) for tag in ['lat', 'lng'])
+    return coordinates
 
 
 def chartmetuk():
@@ -44,16 +42,16 @@ def aviationweather():
     table = {'North Atlantic': '135', 'Europa/Asia': '105', 'Polar North America/Europe': '108',
              'America/Africa': '130', 'Pacific': '131', 'Polar South Africa/Australia': '109'}
     url = 'https://aviationweather.gov/data/iffdp/'
-    times = ['Latest', '6h', '12h', '18h']
-    # Create dictionary of dictionaries {area:{'times':url, ...}} for every area in table
+    time = ['Latest', '6h', '12h', '18h']
+    # Create dictionary of dictionaries {area:{'time':url, ...}} for every area in table
     sigwx_links = {area: {k: url + f'{i}{table[area]}.gif' for k,
-                          i in zip(times, range(2, 6))} for area in table.keys()}
+                          i in zip(time, range(2, 6))} for area in table.keys()}
     return sigwx_links
 
 
 def airports_codes(coords, radius=50, filename='airports.json'):
 
-    def great_circle(lon1, lat1, lon2, lat2):
+    def great_circle_helper(lon1, lat1, lon2, lat2):
         # Return great circle distances in Km
         lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
         dlon = lon2 - lon1
@@ -70,7 +68,7 @@ def airports_codes(coords, radius=50, filename='airports.json'):
         # Get lat and long from airports in airports_codes
         airpt_lon, airpt_lat = [float(coord) for coord in airpt['coordinates'].split(',')]
         # Calculate distances and store them in a dictionary {'icao_code': dist, ...}
-        dist = great_circle(airpt_lon, airpt_lat, target_lon, target_lat)
+        dist = great_circle_helper(airpt_lon, airpt_lat, target_lon, target_lat)
         distances[airpt['icao_code']] = dist
     # Sort distances dictionary
     sorted_dist = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
@@ -82,14 +80,27 @@ def airports_codes(coords, radius=50, filename='airports.json'):
     return target_icao_codes, target_names
 
 
-def get_metar(icao_code):
-    url = f'https://www.aviationweather.gov/metar/data?ids={icao_code}&format=raw&taf=on'
-    source = bSoup(requests.get(url).text, 'lxml')
-    metar = [elem.text.replace('\xa0\xa0', '\n') for elem in source.find_all('code')]
-    return metar
+def get_metar(coords):
+
+    def metar_helper(icao_code):
+        url = f'https://www.aviationweather.gov/metar/data?ids={icao_code}&format=raw&taf=on'
+        source = bSoup(requests.get(url).text, 'lxml')
+        metar = [elem.text.replace('\xa0\xa0', '\n') for elem in source.find_all('code')]
+        return metar
+
+    icao_codes, names = airports_codes(coords)
+    # Call metar_helper() in parallel for each icao_code given
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future = executor.submit(metar_helper, icao_codes)
+        result = future.result()
+    # Create list of tuples from result list [(METAR1, TAF1), ...]
+    result = zip(*(iter(result),) * 2)
+    # Create dict from result {airport_name : (METAR, TAF), ...}
+    return {k: v for k, v in zip(names, result)}
 
 
 if __name__ == '__main__':
-    # print(airports_codes(mapquest('milano')))
-    main()
-    # get_metar('limc')
+    pass
+    # main()
+    # get_metar(mapquest('milano'))
+    # mapquest('milano')

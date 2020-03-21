@@ -81,7 +81,7 @@
             </div>
 
             <div class="tab-pane fade" id="nav-metar" role="tabpanel" aria-labelledby="nav-metar-tab">
-                {% for name, metar_data in metars %}
+                {% for name, metar_data in metar.items %}
                 <h3>{{ name }}</h3>
                 <h5>METAR</h5>
                 <p>{{ metar_data.0 }}</p>
