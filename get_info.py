@@ -39,7 +39,7 @@ def chartsdwd():
 
 
 def aviationweather():
-    table = {'North Atlantic': '135', 'Europa/Asia': '105', 'Polar North America/Europe': '108',
+    table = {'North Atlantic': '135', 'Europe/Asia': '105', 'Polar North America/Europe': '108',
              'America/Africa': '130', 'Pacific': '131', 'Polar South Africa/Australia': '109'}
     url = 'https://aviationweather.gov/data/iffdp/'
     time = ['Latest', '6h', '12h', '18h']
@@ -80,27 +80,25 @@ def airports_codes(coords, radius=50, filename='airports.json'):
     return target_icao_codes, target_names
 
 
-def get_metar(coords):
-
-    def metar_helper(icao_code):
-        url = f'https://www.aviationweather.gov/metar/data?ids={icao_code}&format=raw&taf=on'
-        source = bSoup(requests.get(url).text, 'lxml')
-        metar = [elem.text.replace('\xa0\xa0', '\n') for elem in source.find_all('code')]
-        return metar
-
-    icao_codes, names = airports_codes(coords)
-    # Call metar_helper() in parallel for each icao_code given
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        future = executor.submit(metar_helper, icao_codes)
-        result = future.result()
-    # Create list of tuples from result list [(METAR1, TAF1), ...]
-    result = zip(*(iter(result),) * 2)
-    # Create dict from result {airport_name : (METAR, TAF), ...}
-    return {k: v for k, v in zip(names, result)}
+def get_metar(coords, radius=50, filename='airports.json'):
+    icao_codes, names = airports_codes(coords, radius=radius, filename=filename)
+    icao_codes = ' '.join([elem for elem in icao_codes])
+    url = f'https://www.aviationweather.gov/metar/data?ids={icao_codes}&format=decoded&taf=on&layout=off'
+    page = bSoup(requests.get(url).text, 'lxml')
+    tables = page.find_all('table')
+    tds = []
+    for table in tables:
+        tds.append([elem.text.split(':', 1) for elem in table.find_all('tr')])
+    # names_metar_taf = [(airport_name,[[metar_tag, metar_value],..],[taf_tag, taf_value], ...]), ...]
+    names_metar_taf = list(zip(names, *[iter(tds), ] * 2))
+    return names_metar_taf
 
 
 if __name__ == '__main__':
-    pass
+    coords = mapquest('Washington d.c.')
+    print(get_metar(coords, radius=20)[2])
     # main()
     # get_metar(mapquest('milano'))
     # mapquest('milano')
+
+    "git commit -a -m 'Simplified get_metar(), adjusted template.html() and meteo.py'"
