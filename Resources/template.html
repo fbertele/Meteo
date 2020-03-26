@@ -50,7 +50,7 @@
                 <div class="scrollmenu">
                     {% for surface_link in surface_links.0 %}
                     <div class="image">
-                        <img id="surwc" src="{{surface_link}}" alt="">
+                        <img id="surwc" src="{{ surface_link }}" alt="">
                     </div>
                     {% endfor %}
                 </div>
@@ -58,7 +58,7 @@
                 <div class="scrollmenu">
                     {% for surface_link in surface_links.1 %}
                     <div class="image">
-                        <img id="surwc_dwd" src="{{surface_link}}" alt="">
+                        <img id="surwc_dwd" src="{{ surface_link }}" alt="">
                     </div>
                     {% endfor %}
                 </div>
@@ -73,26 +73,26 @@
 
                     {% for sigwx_link_area, sigwx_link_image in sigwx_links.items %}
                     <div class="card mt-2">
-                        <div class="card-header" id="heading{{forloop.counter}}" data-toggle="collapse" data-target="#collapse{{forloop.counter}}" aria-expanded="true" aria-controls="collapse{{forloop.counter}}" style="cursor:pointer">
+                        <div class="card-header" id="heading{{ forloop.counter }}" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}" style="cursor:pointer">
                             <h5 class="mb-0">
                                 {{sigwx_link_area}}
                             </h5>
                         </div>
 
-                        <div id="collapse{{forloop.counter}}" class="collapse" aria-labelledby="heading{{forloop.counter}}" data-parent="#accordion">
-                            <div id="carousel{{forloop.counter}}" class="carousel slide" data-interval="false">
+                        <div id="collapse{{ forloop.counter }}" class="collapse" aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordion">
+                            <div id="carousel{{ forloop.counter }}" class="carousel slide" data-interval="false">
                                 <div class="carousel-inner">
                                     {% for title, link in sigwx_link_image.items %}
-                                    <div class="carousel-item {{forloop.first|yesno:"active, "}}">
+                                    <div class="carousel-item {{ forloop.first|yesno:"active, " }}">
                                         <h5>{{title}}</h5>
-                                        <img class="d-block w-100" src="{{link}}" alt="{{link}}">
+                                        <img class="d-block w-100" src="{{ link }}" alt="{{ link }}">
                                     </div>
                                     {% endfor %}
                                 </div>
-                                <a class="carousel-control-prev" href="#carousel{{forloop.counter}}" role="button" data-slide="prev">
+                                <a class="carousel-control-prev" href="#carousel{{ forloop.counter }}" role="button" data-slide="prev">
                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                 </a>
-                                <a class="carousel-control-next" href="#carousel{{forloop.counter}}" role="button" data-slide="next">
+                                <a class="carousel-control-next" href="#carousel{{ forloop.counter }}" role="button" data-slide="next">
                                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                 </a>
                             </div>
@@ -104,19 +104,24 @@
 
 
             <div class="tab-pane fade" id="nav-metar" role="tabpanel" aria-labelledby="nav-metar-tab">
-                {% for name, metar, taf in names_metar_taf %}
+                {% for name, metar_taf_raw, metar, taf in names_metar_taf %}
                 <div class="card mt-3">
-                    <h4 class="card-header"> {{name}} </h4>
+                    <h4 class="card-header"> {{ name }} </h4>
                     <div class="card-body">
                         <h5>METAR</h5>
-                        <p>{{metar.1.1}}</p>
+                        <p>{{ metar_taf_raw.0 }}</p>
                         <h5>TAF</h5>
-                        <p>{{taf.1.1}}</p>
+                        <p>{{ metar_taf_raw.1|linebreaksbr }}</p>
                     </div>
-                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse{{forloop.counter}}" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
-                        Decode
-                    </button>
-                    <div class="collapse" id="collapse{{forloop.counter}}">
+                    <p class='ml-3'>
+                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse{{forloop.counter}}_metar" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
+                            Decode METAR
+                        </button>
+                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse{{forloop.counter}}_taf" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
+                            Decode TAF
+                        </button>
+                    </p>
+                    <div class="collapse" id="collapse{{forloop.counter}}_metar">
                         <table class="table">
                             {% for elem in metar %}
                             <tr>
@@ -125,11 +130,13 @@
                             </tr>
                             {% endfor %}
                         </table>
+                    </div>
+                    <div class="collapse" id="collapse{{forloop.counter}}_taf">
                         <table class="table">
                             {% for elem in taf %}
                             <tr>
-                                <th scope="row">{{elem.0}}</th>
-                                <td style="width: 75%">{{elem.1}}</td>
+                                <th scope="row">{{ elem.0 }}</th>
+                                <td style="width: 75%">{{ elem.1 }}</td>
                             </tr>
                             {% endfor %}
                         </table>
