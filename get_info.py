@@ -86,19 +86,22 @@ def get_metar(coords, radius=50, filename='airports.json'):
     url = f'https://www.aviationweather.gov/metar/data?ids={icao_codes}&format=decoded&taf=on&layout=off'
     page = bSoup(requests.get(url).text, 'lxml')
     tables = page.find_all('table')
-    tds = []
+    tds, metar_taf_raw = [], []
     for table in tables:
+        # Find all raw metars and tafs
+        metar = table.find_all(
+            'td', attrs={'style': 'background-color: #CCCCCC; font-weight: bold'})
+        # Place them in a list
+        metar = metar_taf_raw.append('\n'.join([elem.text for elem in metar]))
+        # Create [[tag][value], ...] for all the tds on the page
         tds.append([elem.text.split(':', 1) for elem in table.find_all('tr')])
-    # names_metar_taf = [(airport_name,[[metar_tag, metar_value],..],[taf_tag, taf_value], ...]), ...]
-    names_metar_taf = list(zip(names, *[iter(tds), ] * 2))
+    # join 2 by 2 the metars and taf for same airport
+    metar_taf_raw = list(zip(*[iter(metar_taf_raw), ] * 2))
+    # Join names, metar_taf_raw, metar, taf all together in a list
+    # names_metar_taf = [(airport_name, (metar_raw, taf_raw), [[metar_tag, metar_value],..],[taf_tag, taf_value], ...]), ...]
+    names_metar_taf = list(zip(names, metar_taf_raw, *[iter(tds), ] * 2))
     return names_metar_taf
 
 
 if __name__ == '__main__':
-    coords = mapquest('Washington d.c.')
-    print(get_metar(coords, radius=20)[2])
-    # main()
-    # get_metar(mapquest('milano'))
-    # mapquest('milano')
-
-    "git commit -a -m 'Simplified get_metar(), adjusted template.html() and meteo.py'"
+    pass
