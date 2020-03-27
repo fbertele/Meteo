@@ -1,6 +1,5 @@
 from math import radians, degrees, sin, cos, asin, acos, sqrt
 from bs4 import BeautifulSoup as bSoup
-import concurrent.futures
 import requests
 import json
 import config
@@ -39,8 +38,12 @@ def chartsdwd():
 
 
 def aviationweather():
-    table = {'North Atlantic': '135', 'Europe/Asia': '105', 'Polar North America/Europe': '108',
-             'America/Africa': '130', 'Pacific': '131', 'Polar South Africa/Australia': '109'}
+    table = {'North Atlantic': '135', 'Europe/Asia': '105', 'North/South America': '129',
+             'America/Africa': '130', 'Pacific': '131', 'Europe/Africa': '104',
+             'Asia/Australia': '106', 'Pacific': '128', 'South Africa/Australia Polar': '109',
+             'Europe/Asia Polar': '107', 'North America/Europe Polar': '108',
+             'North Atlantic Polar': '132', 'North Pacific Polar': '133',
+             'South Pacific Polar': '134'}
     url = 'https://aviationweather.gov/data/iffdp/'
     time = ['Latest', '6h', '12h', '18h']
     # Create dictionary of dictionaries {area:{'time':url, ...}} for every area in table
@@ -80,22 +83,31 @@ def airports_codes(coords, radius=50, filename='airports.json'):
     return target_icao_codes, target_names
 
 
-def get_metar(coords, radius=50, filename='airports.json'):
+def get_metar(coords, radius=80, filename='airports.json'):
     icao_codes, names = airports_codes(coords, radius=radius, filename=filename)
     icao_codes = ' '.join([elem for elem in icao_codes])
     url = f'https://www.aviationweather.gov/metar/data?ids={icao_codes}&format=decoded&taf=on&layout=off'
     page = bSoup(requests.get(url).text, 'lxml')
     tables = page.find_all('table')
     tds, metar_taf_raw = [], []
+    style = {'\nTAF for': 'table-success', '\nMETAR for': 'table-success', '\nText': 'table-primary'}
     for table in tables:
         # Find all raw metars and tafs
         metar = table.find_all(
             'td', attrs={'style': 'background-color: #CCCCCC; font-weight: bold'})
         # Place them in a list
         metar = metar_taf_raw.append('\n'.join([elem.text for elem in metar]))
-        # Create [[tag][value], ...] for all the tds on the page
-        tds.append([elem.text.split(':', 1) for elem in table.find_all('tr')])
-    # join 2 by 2 the metars and taf for same airport
+        tag_value_style = []
+        # Create [[tag, value, style], ...] for all the tds on the page
+        for elem in table.find_all('tr'):
+            # Get [tag, value] pairs
+            tag_value = elem.text.split(':', 1)
+            # Add bootstrap class style following style dict
+            tag_value_style.append(
+                tag_value + [(style[tag_value[0]]) if tag_value[0] in style.keys() else ''])
+        # Collect all [[tag, value, style], ...] for different metar, taf and airports
+        tds.append(tag_value_style)
+    # Join 2 by 2 raw the metars and taf for same airport
     metar_taf_raw = list(zip(*[iter(metar_taf_raw), ] * 2))
     # Join names, metar_taf_raw, metar, taf all together in a list
     # names_metar_taf = [(airport_name, (metar_raw, taf_raw), [[metar_tag, metar_value],..],[taf_tag, taf_value], ...]), ...]

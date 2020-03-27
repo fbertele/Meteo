@@ -31,7 +31,7 @@
 
             <div class="tab-pane fade show active" id="nav-windy-rain" role="tabpanel" aria-labelledby="nav-windy-rain-tab">
                 <div class="windy-rain" id="windy-rain">
-                    <h4>Rain forecast</h4>
+                    <h4>Rain Forecast</h4>
                     <iframe width="1200" height="600" src="https://embed.windy.com/embed2.html?lat={{coords.0}}&lon={{coords.1}}&zoom=5&level=surface&overlay=rainAccu&menu=&message=true&marker=&calendar=&pressure=&type=map&location=coordinates&detail=true&detailLat={{coords.0}}&detailLon={{coords.1}}&metricWind=default&metricTemp=default&radarRange=-1"
                         frameborder="0"></iframe>
                 </div>
@@ -46,21 +46,30 @@
             </div>
 
             <div class="tab-pane fade" id="nav-surface" role="tabpanel" aria-labelledby="nav-surface-tab">
-                <h2>Surface weather charts</h2>
-                <div class="scrollmenu">
-                    {% for surface_link in surface_links.0 %}
-                    <div class="image">
-                        <img id="surwc" src="{{ surface_link }}" alt="">
+                <h4>Surface weather charts</h4>
+                <div class="card mt-2">
+                    <div class="card-header">
+                        <h5 class='mt-0 mb-0'>UK Met Charts</h5>
                     </div>
-                    {% endfor %}
+                    <div class="scrollmenu">
+                        {% for surface_link in surface_links.0 %}
+                        <div class="image">
+                            <img id="surwc" src="{{ surface_link }}" alt="">
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
-
-                <div class="scrollmenu">
-                    {% for surface_link in surface_links.1 %}
-                    <div class="image">
-                        <img id="surwc_dwd" src="{{ surface_link }}" alt="">
+                <div class="card mt-2">
+                    <div class="card-header">
+                        <h5 class='mt-0 mb-0'>DWD Charts</h5>
                     </div>
-                    {% endfor %}
+                    <div class="scrollmenu">
+                        {% for surface_link in surface_links.1 %}
+                        <div class="image">
+                            <img id="surwc_dwd" src="{{ surface_link }}" alt="">
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
 
@@ -68,7 +77,7 @@
             <div class="tab-pane fade" id="nav-significant" role="tabpanel" aria-labelledby="nav-significant-tab">
                 <div id="accordion">
                     <div class="header mt-2 mb-1">
-                        <h3>Significant Weather Charts</h3>
+                        <h4>Significant Weather Charts</h4>
                     </div>
 
                     {% for sigwx_link_area, sigwx_link_image in sigwx_links.items %}
@@ -90,10 +99,8 @@
                                     {% endfor %}
                                 </div>
                                 <a class="carousel-control-prev" href="#carousel{{ forloop.counter }}" role="button" data-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                 </a>
                                 <a class="carousel-control-next" href="#carousel{{ forloop.counter }}" role="button" data-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                 </a>
                             </div>
                         </div>
@@ -117,6 +124,12 @@
                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse{{forloop.counter}}_metar" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
                             Decode METAR
                         </button>
+                        <div class="btn-group-toggle" data-toggle="collapse" data-target="#collapse{{forloop.counter}}_metar">
+                            <label class="btn btn-secondary active">
+                                <input type="checkbox" checked autocomplete="off"> Checked
+                            </label>
+                        </div>
+
                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse{{forloop.counter}}_taf" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
                             Decode TAF
                         </button>
@@ -124,9 +137,9 @@
                     <div class="collapse" id="collapse{{forloop.counter}}_metar">
                         <table class="table">
                             {% for elem in metar %}
-                            <tr>
-                                <th scope="row">{{elem.0}}</th>
-                                <td style="width: 75%">{{elem.1}}</td>
+                            <tr class="{{ elem.2 }}">
+                                <th scope="row">{{ elem.0 }}</th>
+                                <td style="width: 75%">{{ elem.1 }}</td>
                             </tr>
                             {% endfor %}
                         </table>
@@ -134,7 +147,7 @@
                     <div class="collapse" id="collapse{{forloop.counter}}_taf">
                         <table class="table">
                             {% for elem in taf %}
-                            <tr>
+                            <tr class="{{ elem.2 }}">
                                 <th scope="row">{{ elem.0 }}</th>
                                 <td style="width: 75%">{{ elem.1 }}</td>
                             </tr>
