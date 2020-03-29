@@ -23,6 +23,7 @@
                     <a class="nav-item nav-link" href="#nav-significant" id="nav-significant-tab" data-toggle="tab" role="tab" aria-controls="nav-significant" aria-selected="false">Significant
                         Weather</a>
                     <a class="nav-item nav-link" href="#nav-metar" id="nav-metar-tab" data-toggle="tab" role="tab" aria-controls="nav-metar" aria-selected="false">METAR/TAF</a>
+                    <a class="nav-item nav-link" href="#nav-satellite" id="nav-satellite-tab" data-toggle="tab" role="tab" aria-controls="nav-satellite" aria-selected="false">Satellite Images</a>
                 </div>
             </nav>
         </div>
@@ -82,25 +83,25 @@
 
                     {% for sigwx_link_area, sigwx_link_image in sigwx_links.items %}
                     <div class="card mt-2">
-                        <div class="card-header" id="heading{{ forloop.counter }}" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}" style="cursor:pointer">
+                        <div class="card-header" id="header{{ forloop.counter }}" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}_sigwx" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}_sigwx" style="cursor:pointer">
                             <h5 class="mb-0">
                                 {{sigwx_link_area}}
                             </h5>
                         </div>
 
-                        <div id="collapse{{ forloop.counter }}" class="collapse" aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordion">
-                            <div id="carousel{{ forloop.counter }}" class="carousel slide" data-interval="false">
+                        <div id="collapse{{ forloop.counter }}_sigwx" class="collapse" aria-labelledby="header{{ forloop.counter }}_sigwx" data-parent="#accordion">
+                            <div id="carousel{{ forloop.counter }}_sigwx" class="carousel slide" data-interval="false">
                                 <div class="carousel-inner">
                                     {% for title, link in sigwx_link_image.items %}
-                                    <div class="carousel-item {{ forloop.first|yesno:"active, " }}">
+                                    <div class="carousel-item {{ forloop.first|yesno:"active, " }}" style="transition-duration: 0.5s">
                                         <h5>{{title}}</h5>
                                         <img class="d-block w-100" src="{{ link }}" alt="{{ link }}">
                                     </div>
                                     {% endfor %}
                                 </div>
-                                <a class="carousel-control-prev" href="#carousel{{ forloop.counter }}" role="button" data-slide="prev">
+                                <a class="carousel-control-prev" href="#carousel{{ forloop.counter }}_sigwx" role="button" data-slide="prev">
                                 </a>
-                                <a class="carousel-control-next" href="#carousel{{ forloop.counter }}" role="button" data-slide="next">
+                                <a class="carousel-control-next" href="#carousel{{ forloop.counter }}_sigwx" role="button" data-slide="next">
                                 </a>
                             </div>
                         </div>
@@ -120,20 +121,16 @@
                         <h5>TAF</h5>
                         <p>{{ metar_taf_raw.1|linebreaksbr }}</p>
                     </div>
+
                     <p class='ml-3'>
                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse{{forloop.counter}}_metar" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
                             Decode METAR
                         </button>
-                        <div class="btn-group-toggle" data-toggle="collapse" data-target="#collapse{{forloop.counter}}_metar">
-                            <label class="btn btn-secondary active">
-                                <input type="checkbox" checked autocomplete="off"> Checked
-                            </label>
-                        </div>
-
                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse{{forloop.counter}}_taf" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
                             Decode TAF
                         </button>
                     </p>
+
                     <div class="collapse" id="collapse{{forloop.counter}}_metar">
                         <table class="table">
                             {% for elem in metar %}
@@ -156,6 +153,36 @@
                     </div>
                 </div>
                 {% endfor %}
+            </div>
+
+            <div class="tab-pane fade" id="nav-satellite" role="tabpanel" aria-labelledby="nav-satellite-tab">
+                <div id="accordion">
+                    <div class="header mt-2 mb-1">
+                        <h4>Satellite Weather Charts</h4>
+                    </div>
+
+                    {% for name, links in sat_links.items %}
+                    <div class="card mt-2">
+                        <div class="card-header" id="header{{ forloop.counter }}_sat" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}_sat" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}_sat" style="cursor:pointer">
+                            <h5 class="mb-0">
+                                {{ name }}
+                            </h5>
+                        </div>
+
+                        <div id="collapse{{ forloop.counter }}_sat" class="collapse" aria-labelledby="header{{ forloop.counter }}_sat" data-parent="#accordion">
+                            <div id="carousel{{ forloop.counter }}_sat" class="carousel slide" data-interval="500" data-ride="carousel" >
+                                <div class="carousel-inner">
+                                    {% for link in links  %}
+                                    <div class="carousel-item{{ forloop.first|yesno:" active," }}" style="transition-duration: 0s">
+                                        <img class="d-block w-100" src="{{ link }}" alt="{{ link }}">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
 </body>
 
