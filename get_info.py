@@ -1,12 +1,13 @@
 from math import radians, degrees, sin, cos, asin, acos, sqrt
 from bs4 import BeautifulSoup as bSoup
+import concurrent.futures
 import requests
 import json
 import config
 import os
 
 
-def mapquest(location):
+def get_coord(location):
     key = config.api_key
     url = f'http://www.mapquestapi.com/geocoding/v1/address?key={key}&location={location}'
     source = requests.get(url).text
@@ -16,7 +17,7 @@ def mapquest(location):
     return coordinates
 
 
-def chartmetuk():
+def swc_ukmetoffice():
     url = 'https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure'
     source = bSoup(requests.get(url).text, 'lxml')
     # Scrape list of charts from page
@@ -26,7 +27,7 @@ def chartmetuk():
     return surface_links_uk
 
 
-def chartsdwd():
+def swc_dwd():
     url = 'https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten'
     uri_list = ['/bwk_bodendruck_na_ana.png', '/ico_tkboden_na_024.png',
                 '/ico_tkboden_na_V36.png', '/ico_tkboden_na_036.png', '/ico_tkboden_na_048.png']
@@ -37,7 +38,7 @@ def chartsdwd():
     return surface_links_dwd
 
 
-def aviationweather():
+def sigwx_aviationweather():
     table = {'North Atlantic': '135', 'Europe/Asia': '105', 'North/South America': '129',
              'America/Africa': '130', 'Pacific': '131', 'Europe/Africa': '104',
              'Asia/Australia': '106', 'Pacific': '128', 'South Africa/Australia Polar': '109',
@@ -46,7 +47,7 @@ def aviationweather():
              'South Pacific Polar': '134'}
     url = 'https://aviationweather.gov/data/iffdp/'
     time = ['Latest', '6h', '12h', '18h']
-    # Create dictionary of dictionaries {area:{'time':url, ...}} for every area in table
+    # Create dictionary of dictionaries {area:{'time':url, ...}} for each area in table
     sigwx_links = {area: {k: url + f'{i}{table[area]}.gif' for k,
                           i in zip(time, range(2, 6))} for area in table.keys()}
     return sigwx_links
@@ -113,6 +114,31 @@ def get_metar(coords, radius=80, filename='airports.json'):
     # names_metar_taf = [(airport_name, (metar_raw, taf_raw), [[metar_tag, metar_value],..],[taf_tag, taf_value], ...]), ...]
     names_metar_taf = list(zip(names, metar_taf_raw, *[iter(tds), ] * 2))
     return names_metar_taf
+
+
+def sat_aviationweather():
+
+    def sat_helper(type):
+        url = f'https://aviationweather.gov/satellite/intl?region=b1&type={type}'
+        page = bSoup(requests.get(url).text, 'lxml')
+        links = page.find(id='content').find_all('script')
+        # Get function that place image uris in image_url list
+        url_fun = links[-1].text.strip('\n')
+        # Initialise image_url longer than needed
+        image_url = [None]*len(url_fun)
+        # Execute function and fill image_url with image uris
+        image = exec(compile(url_fun, '*', 'exec'))
+        # Remove unnecessary padding and complete url with main domain
+        sat_links = [f'https://aviationweather.gov{elem}' for elem in image_url if elem]
+        return sat_links
+
+    # Create dictionary {name:tag, ...} for sat images types
+    types = {'Infrared': 'irbw', 'Infrared coloured': 'ircol',
+             'Visible': 'vis', 'Water Vapour': 'wv'}
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # Create dictionary {name:[link1, ...], ...} for names in types keys
+        results = {name: executor.submit(sat_helper, tag).result() for name, tag in types.items()}
+    return results
 
 
 if __name__ == '__main__':
