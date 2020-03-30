@@ -5,6 +5,7 @@ import requests
 import json
 import config
 import os
+from time import time
 
 
 def get_coord(location):
@@ -116,7 +117,7 @@ def get_metar(coords, radius=80, filename='airports.json'):
     return names_metar_taf
 
 
-def sat_aviationweather():
+def sat_aviationweather_old():
 
     def sat_helper(type):
         url = f'https://aviationweather.gov/satellite/intl?region=b1&type={type}'
@@ -141,6 +142,30 @@ def sat_aviationweather():
     return results
 
 
+def sat_aviationweather():
+    types = {'Infrared': 'irbw', 'Infrared coloured': 'ircol',
+             'Visible': 'vis', 'Water Vapour': 'wv'}
+    url = f'https://aviationweather.gov/satellite/intl?region=b1&type=irbw'
+    page = bSoup(requests.get(url).text, 'lxml')
+    links = page.find(id='content').find_all('script')
+    # Get function that place image uris in image_url list
+    url_fun = links[-1].text.strip('\n')
+    # Initialise image_url longer than needed
+    image_url = [None]*len(url_fun)
+    # Execute function and fill image_url with image uris
+    image = exec(compile(url_fun, '*', 'exec'))
+    # Split uris allow change of type of image at uri[3]
+    sat_uris_split = [elem.split('_') for elem in image_url if elem]
+    res = {}
+    for name, tag in types.items():
+        temp_res = []
+        for uri in sat_uris_split:
+            uri[3] = tag
+            temp_res.append(f"https://aviationweather.gov{'_'.join(uri)}")
+        # Create dictionary {name:[link1, ...], ...} for names in types keys
+        res[name] = temp_res
+    return res
+
+
 if __name__ == '__main__':
-    # pass
-    print(get_coord('milano'))
+    pass
