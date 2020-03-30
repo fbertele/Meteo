@@ -1,14 +1,23 @@
 from get_info import *
 from DjangoHelper import DjangoHelper
-import sys
+import argparse
+
+
+def parser():
+    p = argparse.ArgumentParser(description='Display aeronautical metereological Information')
+    p.add_argument('location', nargs='*')
+    p.add_argument('-sat', '--satellite', action='store_true')
+    args = p.parse_args()
+    args.location = ' '.join(args.location)
+    return args
 
 
 def main():
-    coords = get_coord(sys.argv[1]) if len(sys.argv) > 1 else (53.079, 8.801)
+    coords = get_coord(args.location) if args.location else (45.467, 9.19)
     names_metar_taf = get_metar(coords)
     surface_links = [swc_ukmetoffice(), swc_dwd()]
     sigwx_links = sigwx_aviationweather()
-    sat_links = sat_aviationweather()
+    sat_links = sat_aviationweather() if args.satellite else None
     data = {'coords': coords,
             'surface_links': surface_links,
             'sigwx_links': sigwx_links,
@@ -19,4 +28,5 @@ def main():
 
 
 if __name__ == '__main__':
+    args = parser()
     main()

@@ -142,4 +142,5 @@ def sat_aviationweather():
 
 
 if __name__ == '__main__':
-    pass
+    # pass
+    print(get_coord('milano'))
