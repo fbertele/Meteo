@@ -1,17 +1,16 @@
 from math import radians, degrees, sin, cos, asin, acos, sqrt
 from bs4 import BeautifulSoup as bSoup
-import concurrent.futures
-import requests
+from datetime import datetime, timedelta
+from requests import get
 import json
 import config
 import os
-from time import time
 
 
 def get_coord(location):
     key = config.api_key
     url = f'http://www.mapquestapi.com/geocoding/v1/address?key={key}&location={location}'
-    source = requests.get(url).text
+    source = get(url).text
     response = json.loads(source)['results'][0]['locations'][0]
     # Extract coordinates and return them in a tuple
     coordinates = tuple(round(response['latLng'][tag], 3) for tag in ['lat', 'lng'])
@@ -20,11 +19,11 @@ def get_coord(location):
 
 def swc_ukmetoffice():
     url = 'https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure'
-    source = bSoup(requests.get(url).text, 'lxml')
+    source = bSoup(get(url).text, 'lxml')
     # Scrape list of charts from page
     charts_list = source.find(id='colourCharts').find_all('li')
     # Extract links from list
-    surface_links_uk = [chart.img['src'] for chart in charts_list]
+    surface_links_uk = [chart.img['src'] for chart in charts_list][1:]
     return surface_links_uk
 
 
@@ -64,8 +63,8 @@ def airports_codes(coords, radius=50, filename='airports.json'):
         a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
         return 2 * 6371 * asin(sqrt(a))
 
-    path = os.path.dirname(os.path.realpath(__file__))
-    with open(f'{path}/Resources/{filename}', 'r') as codes:
+    file_path = os.path.dirname(os.path.realpath(__file__))
+    with open(f'{file_path}/Resources/{filename}', 'r') as codes:
         airpts = json.load(codes)
     distances = {}
     target_lon, target_lat = coords[1], coords[0]
@@ -89,7 +88,7 @@ def get_metar(coords, radius=80, filename='airports.json'):
     icao_codes, names = airports_codes(coords, radius=radius, filename=filename)
     icao_codes = ' '.join([elem for elem in icao_codes])
     url = f'https://www.aviationweather.gov/metar/data?ids={icao_codes}&format=decoded&taf=on&layout=off'
-    page = bSoup(requests.get(url).text, 'lxml')
+    page = bSoup(get(url).text, 'lxml')
     tables = page.find_all('table')
     tds, metar_taf_raw = [], []
     style = {'\nTAF for': 'table-success', '\nMETAR for': 'table-success', '\nText': 'table-primary'}
@@ -117,36 +116,11 @@ def get_metar(coords, radius=80, filename='airports.json'):
     return names_metar_taf
 
 
-def sat_aviationweather_old():
-
-    def sat_helper(type):
-        url = f'https://aviationweather.gov/satellite/intl?region=b1&type={type}'
-        page = bSoup(requests.get(url).text, 'lxml')
-        links = page.find(id='content').find_all('script')
-        # Get function that place image uris in image_url list
-        url_fun = links[-1].text.strip('\n')
-        # Initialise image_url longer than needed
-        image_url = [None]*len(url_fun)
-        # Execute function and fill image_url with image uris
-        image = exec(compile(url_fun, '*', 'exec'))
-        # Remove unnecessary padding and complete url with main domain
-        sat_links = [f'https://aviationweather.gov{elem}' for elem in image_url if elem]
-        return sat_links
-
-    # Create dictionary {name:tag, ...} for sat images types
-    types = {'Infrared': 'irbw', 'Infrared coloured': 'ircol',
-             'Visible': 'vis', 'Water Vapour': 'wv'}
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        # Create dictionary {name:[link1, ...], ...} for names in types keys
-        results = {name: executor.submit(sat_helper, tag).result() for name, tag in types.items()}
-    return results
-
-
 def sat_aviationweather():
     types = {'Infrared': 'irbw', 'Infrared coloured': 'ircol',
              'Visible': 'vis', 'Water Vapour': 'wv'}
     url = f'https://aviationweather.gov/satellite/intl?region=b1&type=irbw'
-    page = bSoup(requests.get(url).text, 'lxml')
+    page = bSoup(get(url).text, 'lxml')
     links = page.find(id='content').find_all('script')
     # Get function that place image uris in image_url list
     url_fun = links[-1].text.strip('\n')
@@ -165,6 +139,28 @@ def sat_aviationweather():
         # Create dictionary {name:[link1, ...], ...} for names in types keys
         res[name] = temp_res
     return res
+
+
+def sat_24():
+    types = {'Visible': 'vis', 'Infrared': 'infraPolair'}
+    url = 'https://en.sat24.com/image?region=eu'
+    res = {}
+    # Create dictionary {name:[img1_url, ....], ...}
+    for name, tag in types.items():
+        img_urls = [f'{url}&timestamp={time}&type={tag}' for time in time_stamp()]
+        res[name] = img_urls
+    return res
+
+
+def time_stamp(img_num=50, img_time_diff=5, accuracy=10):
+    now = datetime.utcnow() - timedelta(minutes=5)
+    # Return the utc rouded down closest 10 (accuracy) minutes
+    new_minute = (now.minute // accuracy) * accuracy
+    start_time = now + timedelta(minutes=new_minute - now.minute)
+    # Create list of 50 (img_num) time stamps separated by 5 (img_time_diff) minutes as YYYYMMDDHHMM
+    stamp_list = [(start_time - timedelta(minutes=img_time_diff*n)
+                   ).strftime("%Y%m%d%H%M") for n in range(img_num)][::-1]
+    return stamp_list
 
 
 if __name__ == '__main__':
