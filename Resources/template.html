@@ -18,12 +18,12 @@
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <a class="nav-item nav-link active" href="#nav-windy-rain" id="nav-windy-rain-tab" data-toggle="tab" role="tab" aria-controls="nav-windy-rain" aria-selected="true">Weather forecast</a>
-                    <a class="nav-item nav-link" href="#nav-windy-wind" id="nav-windy-wind-tab" data-toggle="tab" role="tab" aria-controls="nav-windy-wind" aria-selected="true">Wind</a>
+                    <a class="nav-item nav-link" href="#nav-windy-wind" id="nav-windy-wind-tab" data-toggle="tab" role="tab" aria-controls="nav-windy-wind" aria-selected="false">Wind</a>
                     <a class="nav-item nav-link" href="#nav-surface" id="nav-surface-tab" data-toggle="tab" role="tab" aria-controls="nav-surface" aria-selected="false">Surface</a>
                     <a class="nav-item nav-link" href="#nav-significant" id="nav-significant-tab" data-toggle="tab" role="tab" aria-controls="nav-significant" aria-selected="false">Significant
                         Weather</a>
                     <a class="nav-item nav-link" href="#nav-metar" id="nav-metar-tab" data-toggle="tab" role="tab" aria-controls="nav-metar" aria-selected="false">METAR/TAF</a>
-                    {% if sat_links %}
+                    {% if sat_data %}
                     <a class="nav-item nav-link" href="#nav-satellite" id="nav-satellite-tab" data-toggle="tab" role="tab" aria-controls="nav-satellite" aria-selected="false">Satellite Images</a>
                     {% endif %}
                 </div>
@@ -35,7 +35,8 @@
             <div class="tab-pane fade show active" id="nav-windy-rain" role="tabpanel" aria-labelledby="nav-windy-rain-tab">
                 <div class="windy-rain" id="windy-rain">
                     <h4>Rain Forecast</h4>
-                    <iframe width="1200" height="600" src="https://embed.windy.com/embed2.html?lat={{coords.0}}&lon={{coords.1}}&zoom=5&level=surface&overlay=rainAccu&menu=&message=true&marker=&calendar=&pressure=&type=map&location=coordinates&detail=true&detailLat={{coords.0}}&detailLon={{coords.1}}&metricWind=default&metricTemp=default&radarRange=-1"
+                    <iframe width="1200" height="600"
+                        src="https://embed.windy.com/embed2.html?lat={{coords.0}}&lon={{coords.1}}&zoom=5&level=surface&overlay=rainAccu&menu=&message=true&marker=&calendar=&pressure=&type=map&location=coordinates&detail=true&detailLat={{coords.0}}&detailLon={{coords.1}}&metricWind=default&metricTemp=default&radarRange=-1"
                         frameborder="0"></iframe>
                 </div>
             </div>
@@ -43,7 +44,8 @@
             <div class="tab-pane fade" id="nav-windy-wind" role="tabpanel" aria-labelledby="nav-windy-wind-tab">
                 <div class="windy-wind" id="windy-wind">
                     <h4>Wind</h4>
-                    <iframe width="1200" height="600" src="https://embed.windy.com/embed2.html?lat={{coords.0}}&lon={{coords.1}}&zoom=3&level=surface&overlay=wind&menu=&message=true&marker=true&calendar=&pressure=true&type=map&location=coordinates&detail=&detailLat={{coords.0}}&detailLon={{coords.1}}&metricWind=kt&metricTemp=%C2%B0C&radarRange=-1"
+                    <iframe width="1200" height="600"
+                        src="https://embed.windy.com/embed2.html?lat={{coords.0}}&lon={{coords.1}}&zoom=3&level=surface&overlay=wind&menu=&message=true&marker=true&calendar=&pressure=true&type=map&location=coordinates&detail=&detailLat={{coords.0}}&detailLon={{coords.1}}&metricWind=kt&metricTemp=%C2%B0C&radarRange=-1"
                         frameborder="0"></iframe>
                 </div>
             </div>
@@ -85,7 +87,8 @@
 
                     {% for sigwx_link_area, sigwx_link_image in sigwx_links.items %}
                     <div class="card mt-2">
-                        <div class="card-header" id="header{{ forloop.counter }}" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}_sigwx" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}_sigwx" style="cursor:pointer">
+                        <div class="card-header" id="header{{ forloop.counter }}" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}_sigwx" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}_sigwx"
+                            style="cursor:pointer">
                             <h5 class="mb-0">
                                 {{sigwx_link_area}}
                             </h5>
@@ -157,37 +160,61 @@
                 {% endfor %}
             </div>
 
-            {% if sat_links %}
+            {% if sat_data %}
             <div class="tab-pane fade" id="nav-satellite" role="tabpanel" aria-labelledby="nav-satellite-tab">
-                <div id="accordion">
-                    <div class="header mt-2 mb-1">
-                        <h4>Satellite Weather Charts</h4>
-                    </div>
 
-                    {% for name, links in sat_links.items %}
+                <div class="header mt-2 mb-1">
+                    <h4>Satellite Weather Charts</h4>
+                </div>
+
+                <div id="accordion">
+                    {% for country, sat_links in sat_data.items %}
+                    {% with outloopcounter=forloop.counter%}
                     <div class="card mt-2">
-                        <div class="card-header" id="header{{ forloop.counter }}_sat" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}_sat" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}_sat" style="cursor:pointer">
+                        <div class="card-header" id="header{{ outloopcounter }}_sat" data-toggle="collapse" data-target="#collapse{{ outloopcounter }}_sat" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}_sat" style="cursor:pointer">
                             <h5 class="mb-0">
-                                {{ name }}
+                                {{ country }}
                             </h5>
+
                         </div>
 
-                        <div id="collapse{{ forloop.counter }}_sat" class="collapse" aria-labelledby="header{{ forloop.counter }}_sat" data-parent="#accordion">
-                            <div id="carousel{{ forloop.counter }}_sat" class="carousel slide" data-interval="150" data-ride="carousel" >
-                                <div class="carousel-inner">
-                                    {% for link in links  %}
-                                    <div class="carousel-item{{ forloop.first|yesno:" active," }}" style="transition-duration: 0s">
-                                        <img class="d-block w-100" src="{{ link }}" alt="{{ link }}">
-                                    </div>
+                        <div id="collapse{{ outloopcounter }}_sat" class="collapse" aria-labelledby="header{{ outloopcounter }}_sat" data-parent="#accordion">
+                            <nav>
+                                <div class="nav nav-pills justify-content-center" id="nav-tab" role="tablist">
+                                    {% for type in sat_links.keys %}
+                                    <a class="nav-item nav-link{{ forloop.first|yesno:" active," }}" href="#nav-sat-carousel-{{outloopcounter}}-{{ forloop.counter }}" data-toggle="tab" role="tab" aria-controls="nav-windy-rain" aria-selected="true">
+                                        {{ type }}
+                                    </a>
                                     {% endfor %}
                                 </div>
+                            </nav>
+                            <div class="tab-content" id="nav-tabContent">
+                                {% for links in sat_links.values %}
+                                <div class="tab-pane fade{{ forloop.first|yesno:" show active," }}" id="nav-sat-carousel-{{outloopcounter}}-{{ forloop.counter }}" role="tabpanel"
+                                    aria-labelledby="nav-sat-carousel-{{outloopcounter}}-{{ forloop.counter }}">
+                                    <div id="carousel-{{outloopcounter}}-{{ forloop.counter }}" class="carousel slide" data-interval="300" data-ride="carousel">
+                                        <div class="carousel-inner">
+                                            {% for link in links %}
+                                            <div class="carousel-item{{ forloop.first|yesno:" active," }}" style="transition-duration: 0s">
+                                                <img class="d-block w-100" src="{{ link }}" alt="{{ link }}">
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
+                    {% endwith %}
                     {% endfor %}
                 </div>
             </div>
             {% endif %}
+
+        </div>
+    </div>
+
 </body>
 
 </html>
