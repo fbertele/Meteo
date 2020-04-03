@@ -13,11 +13,13 @@ def get_coord(location):
     source = get(url).text
     response = json.loads(source)['results'][0]['locations'][0]
     # Extract coordinates and return them in a tuple
-    coordinates = tuple(round(response['latLng'][tag], 3) for tag in ['lat', 'lng'])
+    coordinates = tuple(round(response['latLng'][tag], 3)
+                        for tag in ['lat', 'lng'])
     return coordinates
 
 
 def swc_ukmetoffice():
+    print('Retrieving surface weather charts...')
     url = 'https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure'
     source = bSoup(get(url).text, 'lxml')
     # Scrape list of charts from page
@@ -38,13 +40,16 @@ def swc_dwd():
     return surface_links_dwd
 
 
-def sigwx_aviationweather():
-    table = {'North Atlantic': '135', 'Europe/Asia': '105', 'North/South America': '129',
+def sigwx_aviationweather(full=False):
+    table = {'North Atlantic': '135', 'Europe/Asia': '105',
              'America/Africa': '130', 'Pacific': '131', 'Europe/Africa': '104',
-             'Asia/Australia': '106', 'Pacific': '128', 'South Africa/Australia Polar': '109',
-             'Europe/Asia Polar': '107', 'North America/Europe Polar': '108',
-             'North Atlantic Polar': '132', 'North Pacific Polar': '133',
-             'South Pacific Polar': '134'}
+             'North America/Europe Polar': '108', 'South Pacific Polar': '134'}
+    table_plus = {'North/South America': '129', 'Asia/Australia': '106',
+                  'South Africa/Australia Polar': '109',
+                  'Europe/Asia Polar': '107', 'North Atlantic Polar': '132',
+                  'North Pacific Polar': '133'}
+    # Load all the charts if full is selected
+    table.update(table_plus if full else {})
     url = 'https://aviationweather.gov/data/iffdp/'
     time = ['Latest', '6h', '12h', '18h']
     # Create dictionary of dictionaries {area:{'time':url, ...}} for each area in table
@@ -70,14 +75,18 @@ def airports_codes(coords, radius=50, filename='airports.json'):
     target_lon, target_lat = coords[1], coords[0]
     for airpt in airpts:
         # Get lat and long from airports in airports_codes
-        airpt_lon, airpt_lat = [float(coord) for coord in airpt['coordinates'].split(',')]
+        airpt_lon, airpt_lat = [float(coord)
+                                for coord in airpt['coordinates'].split(',')]
         # Calculate distances and store them in a dictionary {'icao_code': dist, ...}
-        dist = great_circle_helper(airpt_lon, airpt_lat, target_lon, target_lat)
+        dist = great_circle_helper(
+            airpt_lon, airpt_lat, target_lon, target_lat)
         distances[airpt['icao_code']] = dist
     # Sort distances dictionary
-    sorted_dist = {k: v for k, v in sorted(distances.items(), key=lambda item: item[1])}
+    sorted_dist = {k: v for k, v in sorted(
+        distances.items(), key=lambda item: item[1])}
     # Get icao codes for airports in the 50 km radius from target position
-    target_icao_codes = [key for key, value in sorted_dist.items() if value < radius]
+    target_icao_codes = [key for key,
+                         value in sorted_dist.items() if value < radius]
     # Get names of airports in target_icao_codes
     target_names = [airpt['name'] for code in target_icao_codes
                     for airpt in airpts if airpt['icao_code'] == code]
@@ -85,13 +94,16 @@ def airports_codes(coords, radius=50, filename='airports.json'):
 
 
 def get_metar(coords, radius=80, filename='airports.json'):
-    icao_codes, names = airports_codes(coords, radius=radius, filename=filename)
+    print('Retrieving METAR/TAF...')
+    icao_codes, names = airports_codes(
+        coords, radius=radius, filename=filename)
     icao_codes = ' '.join([elem for elem in icao_codes])
     url = f'https://www.aviationweather.gov/metar/data?ids={icao_codes}&format=decoded&taf=on&layout=off'
     page = bSoup(get(url).text, 'lxml')
     tables = page.find_all('table')
     tds, metar_taf_raw = [], []
-    style = {'\nTAF for': 'table-success', '\nMETAR for': 'table-success', '\nText': 'table-primary'}
+    style = {'\nTAF for': 'table-success',
+             '\nMETAR for': 'table-success', '\nText': 'table-primary'}
     for table in tables:
         # Find all raw metars and tafs
         metar = table.find_all(
@@ -117,51 +129,67 @@ def get_metar(coords, radius=80, filename='airports.json'):
 
 
 def sat_aviationweather():
+    print('Retrieving aviation weather satellite images...')
     types = {'Infrared': 'irbw', 'Infrared coloured': 'ircol',
              'Visible': 'vis', 'Water Vapour': 'wv'}
+    regions = {'Atlantic': 'b1', 'Europe/Africa': 'c',
+               'North Atlantic Polar': 'h'}
     url = f'https://aviationweather.gov/satellite/intl?region=b1&type=irbw'
     page = bSoup(get(url).text, 'lxml')
     links = page.find(id='content').find_all('script')
     # Get function that place image uris in image_url list
     url_fun = links[-1].text.strip('\n')
     # Initialise image_url longer than needed
-    image_url = [None]*len(url_fun)
+    image_url = [None] * len(url_fun)
     # Execute function and fill image_url with image uris
     image = exec(compile(url_fun, '*', 'exec'))
     # Split uris allow change of type of image at uri[3]
     sat_uris_split = [elem.split('_') for elem in image_url if elem]
-    res = {}
-    for name, tag in types.items():
-        temp_res = []
-        for uri in sat_uris_split:
-            uri[3] = tag
-            temp_res.append(f"https://aviationweather.gov{'_'.join(uri)}")
-        # Create dictionary {name:[link1, ...], ...} for names in types keys
-        res[name] = temp_res
-    return res
+    sat_data = {}
+    for region, region_tag in regions.items():
+        sat_links = {}
+        for type, tag in types.items():
+            temp_res = []
+            for uri in sat_uris_split:
+                uri[3] = tag
+                uri[4] = f'{region_tag}.jpg'
+                temp_res.append(f"https://aviationweather.gov{'_'.join(uri)}")
+            # Create dictionary {name:[link1, ...], ...} for names in types keys
+            sat_links[type] = temp_res
+        sat_data[region] = sat_links
+    return sat_data
 
 
-def sat_24():
+def sat_24(img_num=30, img_time_diff=15, accuracy=10, full=False):
+
+    def time_stamp(img_num, img_time_diff, accuracy):
+        now = datetime.utcnow() - timedelta(minutes=5)
+        # Return the utc rouded down closest 10 (accuracy) minutes
+        new_minute = (now.minute // accuracy) * accuracy
+        start_time = now + timedelta(minutes=new_minute - now.minute)
+        # Create list of 50 (img_num) time stamps separated by 5 (img_time_diff) minutes as YYYYMMDDHHMM
+        stamp_list = [(start_time - timedelta(minutes=img_time_diff * n)
+                       ).strftime("%Y%m%d%H%M") for n in range(img_num)][::-1]
+        return stamp_list
+
+    print('Retrieving sat24 weather satellite images...')
     types = {'Visible': 'vis', 'Infrared': 'infraPolair'}
-    url = 'https://en.sat24.com/image?region=eu'
-    res = {}
-    # Create dictionary {name:[img1_url, ....], ...}
-    for name, tag in types.items():
-        img_urls = [f'{url}&timestamp={time}&type={tag}' for time in time_stamp()]
-        res[name] = img_urls
-    return res
-
-
-def time_stamp(img_num=50, img_time_diff=5, accuracy=10):
-    now = datetime.utcnow() - timedelta(minutes=5)
-    # Return the utc rouded down closest 10 (accuracy) minutes
-    new_minute = (now.minute // accuracy) * accuracy
-    start_time = now + timedelta(minutes=new_minute - now.minute)
-    # Create list of 50 (img_num) time stamps separated by 5 (img_time_diff) minutes as YYYYMMDDHHMM
-    stamp_list = [(start_time - timedelta(minutes=img_time_diff*n)
-                   ).strftime("%Y%m%d%H%M") for n in range(img_num)][::-1]
-    return stamp_list
+    regions = {'Europe': 'eu', 'Italy': 'it', 'Germany': 'de', 'Alps': 'alps'}
+    time_stamps = time_stamp(img_num, img_time_diff, accuracy)
+    sat_data = {}
+    for region, region_tag in regions.items():
+        url = f'https://en.sat24.com/image?region={region_tag}'
+        sat_links = {}
+        # Create dictionary {type:[img1_url, ....], ...}
+        for type, tag in types.items():
+            img_urls = [
+                f'{url}&timestamp={time}&type={tag}' for time in time_stamps]
+            sat_links[type] = img_urls
+        # Create dictionary {country{type:[img_url, ...], ....}, ...}
+        sat_data[region] = sat_links
+    return sat_data
 
 
 if __name__ == '__main__':
-    pass
+    # pass
+    print([elem for elem in sat_aviationweather()])
