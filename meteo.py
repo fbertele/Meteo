@@ -4,7 +4,8 @@ import argparse
 
 
 def parser():
-    p = argparse.ArgumentParser(description='Display aeronautical metereological Information')
+    p = argparse.ArgumentParser(
+        description='Display aeronautical metereological Information')
     p.add_argument('location', nargs='*')
     p.add_argument('-sat', '--satellite', action='store_true')
     args = p.parse_args()
@@ -17,12 +18,12 @@ def main():
     names_metar_taf = get_metar(coords)
     surface_links = [swc_ukmetoffice(), swc_dwd()]
     sigwx_links = sigwx_aviationweather()
-    sat_links = sat_aviationweather() if args.satellite else None
+    sat_data = sat_24() if args.satellite else None
     data = {'coords': coords,
             'surface_links': surface_links,
             'sigwx_links': sigwx_links,
             'names_metar_taf': names_metar_taf,
-            'sat_links': sat_links}
+            'sat_data': sat_data}
     page = DjangoHelper(data)
     page.show()
 
