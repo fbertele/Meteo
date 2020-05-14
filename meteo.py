@@ -14,12 +14,13 @@ def parser():
 
 
 def main():
-    coords = get_coord(args.location) if args.location else (45.467, 9.19)
+    coords, location = get_coord(args.location) if args.location else (45.467, 9.19)
     names_metar_taf = get_metar(coords)
     surface_links = [swc_ukmetoffice(), swc_dwd()]
     sigwx_links = sigwx_aviationweather()
     sat_data = sat_24() if args.satellite else None
-    data = {'coords': coords,
+    data = {'location': location,
+            'coords': coords,
             'surface_links': surface_links,
             'sigwx_links': sigwx_links,
             'names_metar_taf': names_metar_taf,

@@ -12,10 +12,11 @@ def get_coord(location):
     url = f'http://www.mapquestapi.com/geocoding/v1/address?key={key}&location={location}'
     source = get(url).text
     response = json.loads(source)['results'][0]['locations'][0]
+    location = response['adminArea5']
     # Extract coordinates and return them in a tuple
     coordinates = tuple(round(response['latLng'][tag], 3)
                         for tag in ['lat', 'lng'])
-    return coordinates
+    return coordinates, location
 
 
 def swc_ukmetoffice():
@@ -191,5 +192,4 @@ def sat_24(img_num=30, img_time_diff=15, accuracy=10, full=False):
 
 
 if __name__ == '__main__':
-    # pass
-    print([elem for elem in sat_aviationweather()])
+    pass
