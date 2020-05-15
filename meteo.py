@@ -14,7 +14,7 @@ def parser():
 
 
 def main():
-    coords, location = get_coord(args.location) if args.location else (45.467, 9.19)
+    coords, location = get_coord(args.location)
     names_metar_taf = get_metar(coords)
     surface_links = [swc_ukmetoffice(), swc_dwd()]
     sigwx_links = sigwx_aviationweather()

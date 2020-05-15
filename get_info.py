@@ -7,7 +7,11 @@ import config
 import os
 
 
-def get_coord(location):
+def get_coord(*location):
+    '''Return coordinates if location is apssed else return coordinates of Milano'''
+    # Default values to use when location is not passed
+    if not all(location):
+        return ((45.467, 9.19), 'Milano')
     key = config.api_key
     url = f'http://www.mapquestapi.com/geocoding/v1/address?key={key}&location={location}'
     source = get(url).text
@@ -20,6 +24,7 @@ def get_coord(location):
 
 
 def swc_ukmetoffice():
+    '''Retrieves surface weather charts links from UK met office website'''
     print('Retrieving surface weather charts...')
     url = 'https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure'
     source = bSoup(get(url).text, 'lxml')
@@ -31,6 +36,7 @@ def swc_ukmetoffice():
 
 
 def swc_dwd():
+    ''' Create urls for dwd surface weather charts '''
     url = 'https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten'
     uri_list = ['/bwk_bodendruck_na_ana.png', '/ico_tkboden_na_024.png',
                 '/ico_tkboden_na_V36.png', '/ico_tkboden_na_036.png', '/ico_tkboden_na_048.png']
@@ -42,6 +48,7 @@ def swc_dwd():
 
 
 def sigwx_aviationweather(full=False):
+    ''' Create urls for aviation weather significant weather charts '''
     table = {'North Atlantic': '135', 'Europe/Asia': '105',
              'America/Africa': '130', 'Pacific': '131', 'Europe/Africa': '104',
              'North America/Europe Polar': '108', 'South Pacific Polar': '134'}
@@ -59,8 +66,8 @@ def sigwx_aviationweather(full=False):
     return sigwx_links
 
 
-def airports_codes(coords, radius=50, filename='airports.json'):
-
+def airports_codes(coords, radius, filename):
+    ''' Read from filename airport codes in radius distance form coords '''
     def great_circle_helper(lon1, lat1, lon2, lat2):
         # Return great circle distances in Km
         lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
@@ -95,6 +102,7 @@ def airports_codes(coords, radius=50, filename='airports.json'):
 
 
 def get_metar(coords, radius=80, filename='airports.json'):
+    ''' Return metar from airports in radius from coords'''
     print('Retrieving METAR/TAF...')
     icao_codes, names = airports_codes(
         coords, radius=radius, filename=filename)
@@ -130,6 +138,7 @@ def get_metar(coords, radius=80, filename='airports.json'):
 
 
 def sat_aviationweather():
+    ''' Retrieve Satellite images urls from aviation weather '''
     print('Retrieving aviation weather satellite images...')
     types = {'Infrared': 'irbw', 'Infrared coloured': 'ircol',
              'Visible': 'vis', 'Water Vapour': 'wv'}
@@ -162,6 +171,7 @@ def sat_aviationweather():
 
 
 def sat_24(img_num=30, img_time_diff=15, accuracy=10, full=False):
+    ''' Retrieve Satellite images urls from sat_24 '''
 
     def time_stamp(img_num, img_time_diff, accuracy):
         now = datetime.utcnow() - timedelta(minutes=5)
