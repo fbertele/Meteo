@@ -8,7 +8,7 @@ import os
 
 
 def get_coord(*location):
-    '''Return coordinates if location is apssed else return coordinates of Milano'''
+    '''Return coordinates if location is passed else return coordinates of Milano'''
     # Default values to use when location is not passed
     if not all(location):
         return ((45.467, 9.19), 'Milano')

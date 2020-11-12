@@ -14,6 +14,7 @@ def parser():
 
 
 def main():
+    ''' Get all informations needed to render the page '''
     coords, location = get_coord(args.location)
     names_metar_taf = get_metar(coords)
     surface_links = [swc_ukmetoffice(), swc_dwd()]
@@ -25,6 +26,7 @@ def main():
             'sigwx_links': sigwx_links,
             'names_metar_taf': names_metar_taf,
             'sat_data': sat_data}
+    # Pass infos to Django page
     page = DjangoHelper(data)
     page.show()
 

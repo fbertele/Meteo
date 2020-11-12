@@ -1,3 +1,6 @@
+'''
+Class to help with Django boiler template
+'''
 import django
 from django.conf import settings
 from django.template.loader import get_template
@@ -15,6 +18,7 @@ class DjangoHelper(object):
         self.page = self.initialize_template()
 
     def initialize_template(self):
+        ''' Pass 'data' arguments to the page renderer '''
         TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates',
                       'DIRS': [f'{self.path}/{self.template_folder}']}]
         settings.configure(TEMPLATES=TEMPLATES)
@@ -24,6 +28,7 @@ class DjangoHelper(object):
         return page
 
     def show(self):
+        ''' Save locally and open the page '''
         with open(f'{self.path}/{self.template_folder}/page.html', 'w') as f:
             f.write(self.page)
         platform = os.uname().sysname

@@ -175,7 +175,7 @@
                     <div class="header mt-2 mb-1">
                         <h4>Satellite Weather Charts</h4>
                     </div>
-
+                    <span>Hover on over the images to stop the animation</span>
                     <div id="accordion">
                         {% for country, sat_links in sat_data.items %}
                         {% with outloopcounter=forloop.counter%}
@@ -206,7 +206,7 @@
                                         <div id="carousel-{{outloopcounter}}-{{ forloop.counter }}" class="carousel slide" data-interval="300" data-ride="carousel">
                                             <div class="carousel-inner">
                                                 {% for link in links %}
-                                                <div class="carousel-item{{ forloop.first|yesno:" active," }}" style="transition-duration: 0s">
+                                                <div class="carousel-item{{ forloop.first|yesno:" active, " }}" style="transition-duration: 0s">
                                                     <img class="d-block w-100" src="{{ link }}" alt="{{ link }}">
                                                 </div>
                                                 {% endfor %}
